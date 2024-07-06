@@ -3,6 +3,7 @@
 ## Demonstration
 Affirmly is designed to empower users through personalized affirmations combined with journaling.
 
+![Alt text](https://github.com/Shirly8/Affirmly/blob/92ceeedf76d33ee7d376f5a479bac0e12d9cf853/affirmly.gif)
 
 
 ## 🤔 Pain Points and Challenges
