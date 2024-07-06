@@ -1,4 +1,4 @@
-# 📓Affirmly: Therapeutic Journalling with AI
+# 📓Affirmly: Therapeutic Journalling with LLM model
 
 ## Demonstration
 Affirmly is designed to empower users through personalized affirmations combined with journaling.
