@@ -23,6 +23,9 @@ Research shows that affirmations can activate brain areas associated with self-r
 3. **User-Friendly Design**: The intuitive interface and seamless saving process make journaling and organizing entries effortless.
 
 
+### Prototyped on Figma
+![Alt text](https://github.com/Shirly8/Affirmly/blob/1bc07ccce2f1b3cdbb57973f3423d81f2729ef43/Affirmly.png)
+
 
 ## 🛠 Technologies and Frameworks Used
 1. React
