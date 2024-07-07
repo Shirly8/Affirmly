@@ -12,10 +12,9 @@ Affirmly is designed to empower users through personalized affirmations combined
 2. **Lack of Affirmations**:  Affirmations are positive, powerful and motivational statements that can help individuals challenge and overcome negative thoughts. They serve as a tool for self-improvement by reinforcing positive beliefs and fostering a constructive mindset.
 
 - **Why Do Affirmations Matter?** 🤔  
-Research shows that affirmations can activate brain areas associated with self-related processing and reward, making it easier to foster a positive self-image and counteract negative thinking. Affirmations are easier to remember and repeat than complex motivational strategies, which can be beneficial for daily practice.
+Research shows that affirmations can activate brain areas associated with self-related processing and reward, making it easier to set a positive self-image and counteract negative thinking. Affirmations are easier to remember and repeat than complex motivational strategies, which can be beneficial for daily practice.
 
 3. **Lack of Interactivity**: Traditional journaling apps often lack interactivity, leaving users without opportunities for real-time feedback or community support. Many people turn to online communities or social media to vent their feelings and seek support, which can be fragmented and less personal.
- 
 
 ### 🌟 Innovative Solutions
 1. **Tailored Affirmations**: Affirmly generates affirmations based on user's specific journal entries, ensuring relevance and impact
@@ -33,7 +32,7 @@ Research shows that affirmations can activate brain areas associated with self-r
 3. Flask
 4. Python
 5. Ollama API
-6. Phi-3 - LLM developed by Microsoft for Contextual Understanding and 
+6. Phi-3 - LLM developed by Microsoft
 7. SQLite
 8. Node.js/Express.js
 
