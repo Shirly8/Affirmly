@@ -50,6 +50,17 @@ export async function saveEntry(entryData, parentHash = null) {
   const hash = await hashEntry(entryData);
   const timestamp = new Date().toISOString();
 
+  // Determine root hash: if editing, use parent's root; otherwise this is a new root
+  let rootHash = hash;
+  let isNewEntry = true;
+
+  if (parentHash) {
+    isNewEntry = false;
+    // Get the parent's merkle entry to find the root
+    const parentMerkle = await getMerkleEntryByHash(parentHash);
+    rootHash = parentMerkle?.rootHash || parentHash;
+  }
+
   // If no parent hash provided, get the last entry (for new entries)
   if (!parentHash) {
     const lastMerkleEntry = await getLastMerkleEntry();
@@ -61,6 +72,7 @@ export async function saveEntry(entryData, parentHash = null) {
     hash,
     content: entryData,
     timestamp,
+    rootHash,
   };
 
   return new Promise((resolve, reject) => {
@@ -75,11 +87,12 @@ export async function saveEntry(entryData, parentHash = null) {
       parentHash,
       timestamp,
       action: parentHash ? 'edited' : 'created',
+      rootHash,
     };
     transaction.objectStore(MERKLE_TREE_STORE).put(merkleEntry);
 
-    // Update inverted index
-    updateInvertedIndex(entryData, hash, transaction);
+    // Update inverted index with root hash for deduplication
+    updateInvertedIndex(entryData, hash, rootHash, transaction);
 
     transaction.oncomplete = () => {
       resolve({ hash, timestamp, merkleEntry });
@@ -132,6 +145,19 @@ export async function getMerkleTree() {
   });
 }
 
+// Get merkle entry by hash
+async function getMerkleEntryByHash(hash) {
+  if (!db) await initDB();
+
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([MERKLE_TREE_STORE], 'readonly');
+    const request = transaction.objectStore(MERKLE_TREE_STORE).get(hash);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 // Get last merkle entry (for building chain)
 async function getLastMerkleEntry() {
   if (!db) await initDB();
@@ -162,7 +188,7 @@ function tokenize(text) {
 }
 
 // Update inverted index - properly handle async operations within transaction
-function updateInvertedIndex(entryData, entryHash, transaction) {
+function updateInvertedIndex(entryData, entryHash, rootHash, transaction) {
   const words = tokenize(entryData.title + ' ' + entryData.description);
   const uniqueWords = [...new Set(words)];
   const objectStore = transaction.objectStore(INVERTED_INDEX_STORE);
@@ -176,11 +202,11 @@ function updateInvertedIndex(entryData, entryHash, transaction) {
       // Create or update the inverted index entry
       const invertedIndexEntry = existing
         ? existing
-        : { word, entryHashes: [] };
+        : { word, rootHashes: [] };
 
-      // Add hash if not already present
-      if (!invertedIndexEntry.entryHashes.includes(entryHash)) {
-        invertedIndexEntry.entryHashes.push(entryHash);
+      // Add root hash if not already present
+      if (!invertedIndexEntry.rootHashes.includes(rootHash)) {
+        invertedIndexEntry.rootHashes.push(rootHash);
       }
 
       // Put back into store
@@ -201,8 +227,8 @@ export async function searchEntries(query) {
   if (tokens.length === 0) return [];
 
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction([INVERTED_INDEX_STORE, ENTRIES_STORE], 'readonly');
-    const results = new Set();
+    const transaction = db.transaction([INVERTED_INDEX_STORE, ENTRIES_STORE, MERKLE_TREE_STORE], 'readonly');
+    const rootHashes = new Set();
 
     let completedRequests = 0;
 
@@ -212,19 +238,45 @@ export async function searchEntries(query) {
       request.onsuccess = () => {
         const result = request.result;
         if (result) {
-          result.entryHashes.forEach((hash) => results.add(hash));
+          result.rootHashes.forEach((hash) => rootHashes.add(hash));
         }
         completedRequests++;
 
         if (completedRequests === tokens.length) {
-          // Fetch full entries for results
-          const entryPromises = Array.from(results).map((hash) =>
-            getEntryByHash(hash)
-          );
+          // For each root hash, find the latest version
+          const merkleStore = transaction.objectStore(MERKLE_TREE_STORE);
+          const allMerkleRequest = merkleStore.getAll();
 
-          Promise.all(entryPromises).then((entries) => {
-            resolve(entries.filter(e => e !== undefined));
-          });
+          allMerkleRequest.onsuccess = () => {
+            const allMerkleEntries = allMerkleRequest.result;
+
+            // Map root hash to latest version hash
+            const latestVersions = {};
+            allMerkleEntries.forEach((entry) => {
+              const root = entry.rootHash;
+              if (rootHashes.has(root)) {
+                if (!latestVersions[root] ||
+                    new Date(entry.timestamp) > new Date(allMerkleEntries.find(e => e.hash === latestVersions[root])?.timestamp)) {
+                  latestVersions[root] = entry.hash;
+                }
+              }
+            });
+
+            // Fetch full entries for latest versions only
+            const latestHashes = Object.values(latestVersions);
+            const entryPromises = latestHashes.map((hash) =>
+              getEntryByHash(hash)
+            );
+
+            Promise.all(entryPromises).then((entries) => {
+              // Sort by timestamp descending (most recent first)
+              const sorted = entries.filter(e => e !== undefined)
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+              resolve(sorted);
+            });
+          };
+
+          allMerkleRequest.onerror = () => reject(allMerkleRequest.error);
         }
       };
 
