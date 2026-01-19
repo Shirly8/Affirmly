@@ -87,14 +87,11 @@ function App() {
             console.log('V2 created with parent hash:', v1Result.hash);
             console.log('Demo entries created with Merkle chain');
 
-            // Pre-fill form with demo V1 affirmations and show sidebar for showcase
+            // Pre-fill form with demo V1 title/description for showcase
             setTitle(demoV1.title);
             setDescription(demoV1.description);
-            setAffirmations(demoV1.affirmations);
-            setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
-              acc[idx] = true;
-              return acc;
-            }, {}));
+            // Don't pre-fill affirmations - only show in sidebar
+            // Main section should show generated affirmations only
 
             // Set viewing entry to show sidebar by default for showcase
             setViewingEntry({
@@ -102,7 +99,6 @@ function App() {
               content: demoV1,
               timestamp: demoV1.timestamp
             });
-            setEditingEntryHash(v1Result.hash);
           } catch (demoErr) {
             console.error('Error creating demo entries:', demoErr);
           }
@@ -368,7 +364,29 @@ function App() {
               <div className="sidebar-section">
                 <h3>Favorited Affirmations</h3>
                 {viewingEntry.content.affirmations.map((aff, idx) => (
-                  <p key={idx} className="sidebar-affirmation">❤️ {aff}</p>
+                  <div key={idx} className="sidebar-affirmation-container">
+                    <p className="sidebar-affirmation">{aff}</p>
+                    <div
+                      className="sidebar-heart"
+                      onClick={() => {
+                        // Remove this affirmation from the entry and update database
+                        const updatedAffirmations = viewingEntry.content.affirmations.filter((_, i) => i !== idx);
+                        const updatedEntry = {
+                          ...viewingEntry.content,
+                          affirmations: updatedAffirmations
+                        };
+                        saveToStorage(updatedEntry, viewingEntry.hash).then(() => {
+                          setViewingEntry({
+                            ...viewingEntry,
+                            content: updatedEntry
+                          });
+                        });
+                      }}
+                      title="Remove from favorites"
+                    >
+                      ❤️
+                    </div>
+                  </div>
                 ))}
               </div>
 
