@@ -171,7 +171,23 @@ body {
   cursor: pointer;
 }
 
-.send-icon, .save-edit-icon, .heart-icon, .hearted-icon {
+.send-icon {
+  position: absolute;
+  width:20px;
+  bottom:13%;
+  right:6%;
+  cursor: pointer;
+}
+
+.save-edit-icon {
+  position: absolute;
+  width:20px;
+  bottom:13%;
+  right:36px;
+  cursor: pointer;
+}
+
+.heart-icon, .hearted-icon {
   position: absolute;
   width:20px;
   bottom:13%;

@@ -411,10 +411,9 @@ function App() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's on your mind?"
             ></textarea>
-            {editingEntryHash ? (
+            <div className="send-icon" onClick={sendAPI} title="Generate affirmations" />
+            {editingEntryHash && (
               <div className="save-edit-icon" onClick={autoSaveEntry} title="Save edits and create new version" />
-            ) : (
-              <div className="send-icon" onClick={sendAPI} title="Generate affirmations" />
             )}
           </div>
 
