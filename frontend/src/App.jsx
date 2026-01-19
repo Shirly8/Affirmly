@@ -28,6 +28,7 @@ function App() {
 
         // Create demo entries with Merkle chain if no entries exist
         const entries = await getAllEntries();
+        console.log('Entries on load:', entries.length);
         if (entries.length === 0) {
           const demoV1 = {
             title: "I'm 24 and I constantly feel like I'm a failure",
@@ -59,9 +60,16 @@ function App() {
             timestamp: new Date(Date.now() - 1800000).toISOString()
           };
 
-          await saveToStorage(demoV1);
-          await saveToStorage(demoV2);
-          console.log('Demo entries created with Merkle chain');
+          try {
+            const v1Result = await saveToStorage(demoV1);
+            console.log('V1 created with hash:', v1Result.hash);
+
+            const v2Result = await saveToStorage(demoV2, v1Result.hash);
+            console.log('V2 created with parent hash:', v1Result.hash);
+            console.log('Demo entries created with Merkle chain');
+          } catch (demoErr) {
+            console.error('Error creating demo entries:', demoErr);
+          }
         }
       } catch (err) {
         console.error('Failed to initialize DB:', err);
