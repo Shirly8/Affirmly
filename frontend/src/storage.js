@@ -11,16 +11,35 @@ let db = null;
 
 // Initialize IndexedDB
 export async function initDB() {
+  // Return existing connection if already open
+  if (db) {
+    console.log('[storage.js] DB already open, returning existing connection');
+    return db;
+  }
+
   return new Promise((resolve, reject) => {
     console.log('[storage.js] Opening IndexedDB, DB_NAME=' + DB_NAME + ', version=2');
+
+    // Add timeout to detect hanging
+    const timeout = setTimeout(() => {
+      console.error('[storage.js] TIMEOUT: IndexedDB open took more than 5 seconds');
+    }, 5000);
+
     const request = indexedDB.open(DB_NAME, 2);
 
     request.onerror = () => {
+      clearTimeout(timeout);
       console.error('[storage.js] indexedDB.open() error:', request.error);
       reject(request.error);
     };
 
+    request.onblocked = () => {
+      clearTimeout(timeout);
+      console.error('[storage.js] indexedDB.open() BLOCKED - another connection is blocking');
+    };
+
     request.onsuccess = () => {
+      clearTimeout(timeout);
       console.log('[storage.js] indexedDB.open() success, resolving');
       db = request.result;
       resolve(db);
