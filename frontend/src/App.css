@@ -195,7 +195,7 @@ body {
 
 .AffirmlySays {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 15px;
   justify-content: center;
@@ -418,6 +418,29 @@ h2 {
 }
 
 .affirmations-section h3 {
+  margin-top: 0;
+  color: #7C7B7F;
+}
+
+.hash-display {
+  display: block;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  word-break: break-all;
+  color: #61dafbaa;
+  font-family: 'Courier New', monospace;
+  margin-bottom: 15px;
+}
+
+.history-section {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 5px;
+}
+
+.history-section h3 {
   margin-top: 0;
   color: #7C7B7F;
 }

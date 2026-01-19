@@ -243,6 +243,8 @@ function App() {
           </div>
 
           <div className="history-section">
+            <h3>Entry Hash (SHA-256):</h3>
+            <code className="hash-display">{viewingEntry.hash}</code>
             <h3>Version History:</h3>
             <small>Created: {new Date(viewingEntry.timestamp).toLocaleString()}</small>
           </div>
@@ -269,9 +271,12 @@ function App() {
           </div>
 
           <div className="AffirmlySays">
-            <img src={affirmlyIcon} className="affirmlylogo"></img>
+            {loading ? (
+              <img src={affirmlyIcon} className="affirmlylogo spinning" alt="Loading" />
+            ) : (
+              <img src={affirmlyIcon} className="affirmlylogo"></img>
+            )}
             <h2>Affirmly Says</h2>
-            {loading && <img src={affirmlyIcon} className="affirmlylogo spinning" alt="Loading" />}
           </div>
 
           {/* Affirmations generation */}
