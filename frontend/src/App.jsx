@@ -243,6 +243,17 @@ function App() {
   const viewEntryDetails = async (entry) => {
     setViewingEntry(entry);
     setShowSearch(false);  // Auto-close search when viewing entry
+    setEditingEntryHash(entry.hash);  // Mark that we're working with this entry
+
+    // Load entry data into form
+    setTitle(entry.content.title);
+    setDescription(entry.content.description);
+    setAffirmations(entry.content.affirmations);
+    setHeartClicked(entry.content.affirmations.reduce((acc, _, idx) => {
+      acc[idx] = true;
+      return acc;
+    }, {}));
+
     try {
       const history = await getMerkleTree();
       setEntryHistory(history);
@@ -251,20 +262,11 @@ function App() {
     }
   }
 
-  // Edit entry - load it back into the form
+  // Edit entry - focus on form (sidebar stays visible for reference)
   const editEntry = () => {
-    if (viewingEntry) {
-      setTitle(viewingEntry.content.title);
-      setDescription(viewingEntry.content.description);
-      setAffirmations(viewingEntry.content.affirmations);
-      setHeartClicked(viewingEntry.content.affirmations.reduce((acc, _, idx) => {
-        acc[idx] = true;
-        return acc;
-      }, {}));
-      setEditingEntryHash(viewingEntry.hash);  // Track that we're editing this entry
-      setViewingEntry(null);
-      setShowSearch(false);
-    }
+    // Form is already populated from viewEntryDetails
+    // Just close the sidebar to give more space to the form
+    setViewingEntry(null);
   }
 
   // Close popup
@@ -309,7 +311,7 @@ function App() {
       </div>
 
       {/* Search View */}
-      {showSearch ? (
+      {showSearch && (
         <div className="search-view">
           <input
             type="text"
@@ -340,65 +342,69 @@ function App() {
 
           <button className="back-button" onClick={() => setShowSearch(false)}>Back</button>
         </div>
-      ) : viewingEntry ? (
-        /* Entry Details View */
-        <div className="entry-details-view">
-          <div className="entry-actions">
-            <button className="back-button" onClick={() => setViewingEntry(null)}>← Back</button>
+      )}
+
+      {/* Main Layout: Sidebar + Form */}
+      <div className="main-layout">
+        {/* Left Sidebar - Entry Details */}
+        {viewingEntry && (
+          <div className="left-sidebar">
+            <div className="sidebar-header">
+              <h2>{viewingEntry.content.title}</h2>
+              <button
+                className="close-sidebar-btn"
+                onClick={() => {
+                  setViewingEntry(null);
+                  setEditingEntryHash(null);
+                }}
+                title="Close sidebar"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="sidebar-content">
+              <div className="sidebar-section">
+                <h3>Favorited Affirmations</h3>
+                {viewingEntry.content.affirmations.map((aff, idx) => (
+                  <p key={idx} className="sidebar-affirmation">❤️ {aff}</p>
+                ))}
+              </div>
+
+              <div className="sidebar-section">
+                <h3>📋 Version History</h3>
+                <code className="sidebar-hash">{viewingEntry.hash.substring(0, 16)}...</code>
+
+                <div className="sidebar-merkle-chain">
+                  {entryHistory.filter(h => h.hash === viewingEntry.hash).length > 0 ? (
+                    entryHistory
+                      .filter(h => h.hash === viewingEntry.hash ||
+                                   entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash))))
+                      .reverse()
+                      .map((version, idx) => (
+                        <div key={version.hash} className="sidebar-merkle-node">
+                          <small className="node-version">V{idx + 1}</small>
+                          <small className="node-action">{version.action}</small>
+                          <small className="node-date">{new Date(version.timestamp).toLocaleDateString()}</small>
+                        </div>
+                      ))
+                  ) : (
+                    <div className="sidebar-merkle-node">
+                      <small className="node-version">V1</small>
+                      <small className="node-action">created</small>
+                      <small className="node-date">{new Date(viewingEntry.timestamp).toLocaleDateString()}</small>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <button className="edit-button" onClick={editEntry}>✏️ Edit Entry</button>
           </div>
+        )}
 
-          <h2>{viewingEntry.content.title}</h2>
-          <p>{viewingEntry.content.description}</p>
-
-          <div className="affirmations-section">
-            <h3>Favorited Affirmations:</h3>
-            {viewingEntry.content.affirmations.map((aff, idx) => (
-              <p key={idx} className="saved-affirmation">❤️ {aff}</p>
-            ))}
-          </div>
-
-          <div className="history-section">
-            <h3>📋 Current Version Hash (SHA-256):</h3>
-            <code className="hash-display">{viewingEntry.hash}</code>
-
-            <h3>🔗 Merkle Chain History:</h3>
-            <div className="merkle-chain">
-              {entryHistory.filter(h => h.hash === viewingEntry.hash).length > 0 ? (
-                entryHistory
-                  .filter(h => h.hash === viewingEntry.hash ||
-                               entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash))))
-                  .reverse()
-                  .map((version, idx) => (
-                    <div key={version.hash} className="merkle-node">
-                      <div className="version-number">V{idx + 1}</div>
-                      <div className="node-content">
-                        <small className="version-action">{version.action}</small>
-                        <small className="version-date">{new Date(version.timestamp).toLocaleString()}</small>
-                        <code className="version-hash">{version.hash.substring(0, 16)}...</code>
-                      </div>
-                      {idx < entryHistory.filter(h => h.hash === viewingEntry.hash ||
-                                                        entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash)))).reverse().length - 1 && (
-                        <div className="chain-link">↓ parent</div>
-                      )}
-                    </div>
-                  ))
-              ) : (
-                <div className="merkle-node">
-                  <div className="version-number">V1</div>
-                  <div className="node-content">
-                    <small className="version-action">created</small>
-                    <small className="version-date">{new Date(viewingEntry.timestamp).toLocaleString()}</small>
-                    <code className="version-hash">{viewingEntry.hash.substring(0, 16)}...</code>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* Main Journal Entry View */
-        <>
+        {/* Main Form Content */}
+        <div className="main-form-content">
           {/* Journal Entry */}
           <input
             type="text"
@@ -449,8 +455,8 @@ function App() {
               </div>
             </div>
           )}
-        </>
-      )}
+        </div>
+      </div>
 
       {/* Affirmly Entries saved notification */}
       {popup && (

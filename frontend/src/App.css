@@ -689,3 +689,237 @@ h2 {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Main Layout: Sidebar + Form */
+.main-layout {
+  display: flex;
+  gap: 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 100px);
+}
+
+/* Left Sidebar */
+.left-sidebar {
+  width: 350px;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e8f2ff 100%);
+  border-right: 2px solid #61dafbaa;
+  overflow-y: auto;
+  padding: 20px;
+  box-shadow: 2px 0 8px rgba(97, 218, 251, 0.1);
+  animation: slideInLeft 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-350px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  color: #333;
+  margin: 0;
+  flex: 1;
+  line-height: 1.3;
+}
+
+.close-sidebar-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.close-sidebar-btn:hover {
+  color: #61dafbaa;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.sidebar-section {
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(97, 218, 251, 0.2);
+}
+
+.sidebar-section:last-child {
+  border-bottom: none;
+}
+
+.sidebar-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sidebar-affirmation {
+  background: white;
+  padding: 10px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #555;
+  border-left: 3px solid #61dafbaa;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sidebar-hash {
+  display: block;
+  background: #e8f2ff;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+  margin-bottom: 12px;
+  word-break: break-all;
+  border-left: 2px solid #61dafbaa;
+}
+
+.sidebar-merkle-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-merkle-node {
+  background: white;
+  padding: 10px;
+  border-radius: 6px;
+  border-left: 3px solid #61dafbaa;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.sidebar-merkle-node:hover {
+  transform: translateX(4px);
+  box-shadow: 0 2px 6px rgba(97, 218, 251, 0.15);
+}
+
+.sidebar-merkle-node small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.node-version {
+  font-weight: 600;
+  color: #333;
+}
+
+.node-action {
+  color: #999;
+  font-size: 11px;
+}
+
+.node-date {
+  color: #bbb;
+  font-size: 10px;
+}
+
+.left-sidebar .edit-button {
+  width: 100%;
+  margin-top: auto;
+  padding: 12px;
+  background: white;
+  color: #333;
+  border: 2px solid #61dafbaa;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.left-sidebar .edit-button:hover {
+  background: #61dafbaa;
+  color: white;
+  box-shadow: 0 4px 12px rgba(97, 218, 251, 0.3);
+}
+
+/* Main Form Content */
+.main-form-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive Design */
+@media (max-width: 900px) {
+  .main-layout {
+    height: auto;
+    flex-direction: column;
+  }
+
+  .left-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 2px solid #61dafbaa;
+    animation: slideInTop 0.3s ease-out;
+  }
+
+  @keyframes slideInTop {
+    from {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .main-form-content {
+    width: 100%;
+    padding: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sidebar-header h2 {
+    font-size: 16px;
+  }
+
+  .left-sidebar {
+    padding: 15px;
+  }
+
+  .main-form-content {
+    padding: 15px;
+  }
+}
