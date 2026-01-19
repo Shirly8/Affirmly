@@ -20,16 +20,35 @@ function App() {
   const [entryHistory, setEntryHistory] = useState([]);
   const [editingEntryHash, setEditingEntryHash] = useState(null);  // Track which entry we're editing
 
+  // Clear database function for debugging
+  const clearDatabase = async () => {
+    try {
+      const request = indexedDB.deleteDatabase('affirmly');
+      request.onsuccess = () => {
+        console.log('Database cleared');
+        window.location.reload();
+      };
+      request.onerror = () => {
+        console.error('Error clearing database');
+      };
+    } catch (error) {
+      console.error('Error clearing database:', error);
+    }
+  };
+
+  // Make it globally accessible for debugging
+  if (typeof window !== 'undefined') {
+    window.clearAffirmlyDB = clearDatabase;
+  }
+
   // Initialize database on mount
   useEffect(() => {
     const init = async () => {
       try {
         await initDB();
 
-        // Create demo entries with Merkle chain if no entries exist
-        const entries = await getAllEntries();
-        console.log('Entries on load:', entries.length);
-        if (entries.length === 0) {
+        // Always create fresh demo entries
+        {
           const demoV1 = {
             title: "I'm 24 and I constantly feel like I'm a failure",
             description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
@@ -67,6 +86,15 @@ function App() {
             const v2Result = await saveToStorage(demoV2, v1Result.hash);
             console.log('V2 created with parent hash:', v1Result.hash);
             console.log('Demo entries created with Merkle chain');
+
+            // Pre-fill form with demo V1 affirmations
+            setTitle(demoV1.title);
+            setDescription(demoV1.description);
+            setAffirmations(demoV1.affirmations);
+            setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
+              acc[idx] = true;
+              return acc;
+            }, {}));
           } catch (demoErr) {
             console.error('Error creating demo entries:', demoErr);
           }
