@@ -262,13 +262,6 @@ function App() {
     }
   }
 
-  // Edit entry - focus on form (sidebar stays visible for reference)
-  const editEntry = () => {
-    // Form is already populated from viewEntryDetails
-    // Just close the sidebar to give more space to the form
-    setViewingEntry(null);
-  }
-
   // Close popup
   const closePopup = () => {
     showPopup(false);
@@ -372,7 +365,7 @@ function App() {
               </div>
 
               <div className="sidebar-section">
-                <h3>📋 Version History</h3>
+                <h3>Version History</h3>
                 <code className="sidebar-hash">{viewingEntry.hash.substring(0, 16)}...</code>
 
                 <div className="sidebar-merkle-chain">
@@ -398,8 +391,6 @@ function App() {
                 </div>
               </div>
             </div>
-
-            <button className="edit-button" onClick={editEntry}>✏️ Edit Entry</button>
           </div>
         )}
 
@@ -420,7 +411,11 @@ function App() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's on your mind?"
             ></textarea>
-            <div className="send-icon" onClick={sendAPI} />
+            {editingEntryHash ? (
+              <div className="save-edit-icon" onClick={autoSaveEntry} title="Save edits and create new version" />
+            ) : (
+              <div className="send-icon" onClick={sendAPI} title="Generate affirmations" />
+            )}
           </div>
 
           <div className="AffirmlySays">

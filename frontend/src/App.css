@@ -130,6 +130,7 @@ body {
   font-size:20px;
   font-weight:bolder;
   height: 10%;
+  margin: 10px auto;
 }
 
 .description-container{
@@ -151,13 +152,26 @@ body {
   cursor: pointer;
 }
 
+.save-edit-icon {
+  background: url('./assets/icon/5.svg') no-repeat center center;
+  background-size: contain;
+  height: 20px;
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+}
+
+.save-edit-icon:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 4px #61dafbaa);
+}
+
 .heart-icon, .hearted-icon {
   background-size: contain;
   height: 20px;
   cursor: pointer;
 }
 
-.send-icon, .heart-icon, .hearted-icon {
+.send-icon, .save-edit-icon, .heart-icon, .hearted-icon {
   position: absolute;
   width:20px;
   bottom:13%;
