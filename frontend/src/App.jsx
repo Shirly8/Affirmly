@@ -97,8 +97,15 @@ function App() {
           const entryHash = hash.substring('#/entry/'.length);
           try {
             const entry = await getEntryByHash(entryHash);
+            console.log('Loaded entry from URL:', entryHash, entry);
             if (entry) {
-              await viewEntryDetails(entry);
+              // Ensure rootHash is set
+              const entryWithRoot = {
+                ...entry,
+                rootHash: entry.rootHash || entry.hash
+              };
+              console.log('Entry with root:', entryWithRoot);
+              await viewEntryDetails(entryWithRoot);
             } else {
               console.warn('Entry not found for hash:', entryHash);
               // Fallback to demo if entry not found
@@ -110,6 +117,10 @@ function App() {
                 content: demoV1,
                 timestamp: demoV1.timestamp
               });
+              const history = await getMerkleTree();
+              setEntryHistory(history);
+              const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
+              setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
               window.location.hash = `#/entry/${v1Result.hash}`;
             }
           } catch (err) {
@@ -432,11 +443,10 @@ function App() {
                 <code className="sidebar-hash">{viewingEntry.hash.substring(0, 16)}...</code>
 
                 <div className="sidebar-merkle-chain">
-                  {entryHistory.filter(h => h.hash === viewingEntry.hash).length > 0 ? (
+                  {currentVersion && currentVersion.rootHash ? (
                     entryHistory
-                      .filter(h => h.hash === viewingEntry.hash ||
-                                   entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash))))
-                      .reverse()
+                      .filter(h => h.rootHash === currentVersion.rootHash)
+                      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
                       .map((version, idx) => (
                         <div key={version.hash} className="sidebar-merkle-node">
                           <small className="node-version">V{idx + 1}</small>
