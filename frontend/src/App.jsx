@@ -48,66 +48,51 @@ function App() {
       try {
         await initDB();
 
-        // Check if there's an entry hash in the URL first
+        const demoV1 = {
+          title: "I'm 24 and I constantly feel like I'm a failure",
+          description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
+          affirmations: [
+            "Comparison is the thief of joy. I embrace my journey and celebrate the successes of others without diminishing my own.",
+            "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
+            "I am exactly where I need to be at this moment, and I trust the timing of my life.",
+            "My journey is unique and valuable, unfolding at its own perfect pace.",
+          ],
+          mood: "neutral",
+          timestamp: "2025-01-19T10:00:00.000Z"
+        };
+
+        const demoV2 = {
+          title: "I'm 24 and I constantly feel like I'm a failure",
+          description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
+          affirmations: [
+            "I am building a life that is authentically mine, not a copy of someone else's.",
+            "My past does not define my future. Today is a new opportunity to grow.",
+            "I trust in my resilience and my ability to create the life I desire.",
+            "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
+          ],
+          mood: "neutral",
+          timestamp: "2025-01-19T11:00:00.000Z"
+        };
+
+        // Always ensure demo entries exist
+        let v1Result;
+        try {
+          v1Result = await saveToStorage(demoV1);
+          console.log('V1 created with hash:', v1Result.hash);
+
+          await saveToStorage(demoV2, v1Result.hash);
+          console.log('V2 created with parent hash:', v1Result.hash);
+          console.log('Demo entries created with Merkle chain');
+        } catch (demoErr) {
+          console.error('Error creating demo entries:', demoErr);
+          return;
+        }
+
+        // Check if there's an entry hash in the URL
         const hash = window.location.hash;
         const hasEntryHash = hash.startsWith('#/entry/');
 
-        // Only create demo if there's no URL hash
-        if (!hasEntryHash) {
-          const demoV1 = {
-            title: "I'm 24 and I constantly feel like I'm a failure",
-            description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
-            affirmations: [
-              "Comparison is the thief of joy. I embrace my journey and celebrate the successes of others without diminishing my own.",
-              "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
-              "I am exactly where I need to be at this moment, and I trust the timing of my life.",
-              "My journey is unique and valuable, unfolding at its own perfect pace.",
-            ],
-            mood: "neutral",
-            timestamp: "2025-01-19T10:00:00.000Z"
-          };
-
-          const demoV2 = {
-            title: "I'm 24 and I constantly feel like I'm a failure",
-            description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
-            affirmations: [
-              "I am building a life that is authentically mine, not a copy of someone else's.",
-              "My past does not define my future. Today is a new opportunity to grow.",
-              "I trust in my resilience and my ability to create the life I desire.",
-              "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
-            ],
-            mood: "neutral",
-            timestamp: "2025-01-19T11:00:00.000Z"
-          };
-
-          try {
-            const v1Result = await saveToStorage(demoV1);
-            console.log('V1 created with hash:', v1Result.hash);
-
-            await saveToStorage(demoV2, v1Result.hash);
-            console.log('V2 created with parent hash:', v1Result.hash);
-            console.log('Demo entries created with Merkle chain');
-
-            // Pre-fill form with demo V1 title/description for showcase
-            setTitle(demoV1.title);
-            setDescription(demoV1.description);
-            // Don't pre-fill affirmations - only show in sidebar
-            // Main section should show generated affirmations only
-
-            // Set viewing entry to show sidebar by default for showcase
-            setViewingEntry({
-              hash: v1Result.hash,
-              rootHash: v1Result.hash,
-              content: demoV1,
-              timestamp: demoV1.timestamp
-            });
-
-            // Update URL to point to this entry
-            window.location.hash = `#/entry/${v1Result.hash}`;
-          } catch (demoErr) {
-            console.error('Error creating demo entries:', demoErr);
-          }
-        } else {
+        if (hasEntryHash) {
           // Load entry from URL
           const entryHash = hash.substring('#/entry/'.length);
           try {
@@ -116,10 +101,31 @@ function App() {
               await viewEntryDetails(entry);
             } else {
               console.warn('Entry not found for hash:', entryHash);
+              // Fallback to demo if entry not found
+              setTitle(demoV1.title);
+              setDescription(demoV1.description);
+              setViewingEntry({
+                hash: v1Result.hash,
+                rootHash: v1Result.hash,
+                content: demoV1,
+                timestamp: demoV1.timestamp
+              });
+              window.location.hash = `#/entry/${v1Result.hash}`;
             }
           } catch (err) {
             console.error('Error loading entry from URL:', err);
           }
+        } else {
+          // No URL hash - display demo
+          setTitle(demoV1.title);
+          setDescription(demoV1.description);
+          setViewingEntry({
+            hash: v1Result.hash,
+            rootHash: v1Result.hash,
+            content: demoV1,
+            timestamp: demoV1.timestamp
+          });
+          window.location.hash = `#/entry/${v1Result.hash}`;
         }
       } catch (err) {
         console.error('Failed to initialize DB:', err);
