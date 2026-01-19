@@ -21,7 +21,47 @@ function App() {
 
   // Initialize database on mount
   useEffect(() => {
-    initDB().catch(err => console.error('Failed to initialize DB:', err));
+    const init = async () => {
+      try {
+        await initDB();
+
+        // Create demo entries with Merkle chain if no entries exist
+        const entries = await getAllEntries();
+        if (entries.length === 0) {
+          const demoV1 = {
+            title: "Morning Anxiety",
+            description: "Feeling overwhelmed about the day ahead",
+            affirmations: [
+              "I am capable of handling today's challenges",
+              "My worries are temporary, not permanent",
+              "I choose to focus on what I can control",
+            ],
+            mood: "neutral",
+            timestamp: new Date(Date.now() - 3600000).toISOString()
+          };
+
+          const demoV2 = {
+            title: "Morning Anxiety",
+            description: "Feeling overwhelmed about the day ahead",
+            affirmations: [
+              "I am strong and resilient",
+              "Today is full of new opportunities",
+              "I deserve peace and calm",
+              "Every challenge makes me stronger",
+            ],
+            mood: "neutral",
+            timestamp: new Date(Date.now() - 1800000).toISOString()
+          };
+
+          await saveToStorage(demoV1);
+          await saveToStorage(demoV2);
+          console.log('Demo entries created with Merkle chain');
+        }
+      } catch (err) {
+        console.error('Failed to initialize DB:', err);
+      }
+    };
+    init();
   }, []);
 
   // Generate affirmations using Wisest API
@@ -103,6 +143,11 @@ function App() {
       showMessage(`Entry saved: "${title}"`);
       showPopup(true);
 
+      // Auto-close popup after 2 seconds
+      setTimeout(() => {
+        showPopup(false);
+      }, 2000);
+
       // Clear form for new entry
       setTitle("");
       setDescription("");
@@ -153,6 +198,7 @@ function App() {
   // View entry details
   const viewEntryDetails = async (entry) => {
     setViewingEntry(entry);
+    setShowSearch(false);  // Auto-close search when viewing entry
     try {
       const history = await getMerkleTree();
       setEntryHistory(history);
