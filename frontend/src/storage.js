@@ -12,7 +12,7 @@ let db = null;
 // Initialize IndexedDB
 export async function initDB() {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
+    const request = indexedDB.open(DB_NAME, 2);
 
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
@@ -23,16 +23,18 @@ export async function initDB() {
     request.onupgradeneeded = (event) => {
       const database = event.target.result;
 
-      // Create stores if they don't exist
-      if (!database.objectStoreNames.contains(ENTRIES_STORE)) {
-        database.createObjectStore(ENTRIES_STORE, { keyPath: 'hash' });
-      }
-      if (!database.objectStoreNames.contains(MERKLE_TREE_STORE)) {
-        database.createObjectStore(MERKLE_TREE_STORE, { keyPath: 'hash' });
-      }
-      if (!database.objectStoreNames.contains(INVERTED_INDEX_STORE)) {
-        database.createObjectStore(INVERTED_INDEX_STORE, { keyPath: 'word' });
-      }
+      // Clear all stores on schema upgrade to handle migration
+      const storeNames = Array.from(database.objectStoreNames);
+      storeNames.forEach(storeName => {
+        if (database.objectStoreNames.contains(storeName)) {
+          database.deleteObjectStore(storeName);
+        }
+      });
+
+      // Create fresh stores
+      database.createObjectStore(ENTRIES_STORE, { keyPath: 'hash' });
+      database.createObjectStore(MERKLE_TREE_STORE, { keyPath: 'hash' });
+      database.createObjectStore(INVERTED_INDEX_STORE, { keyPath: 'word' });
     };
   });
 }
@@ -200,9 +202,19 @@ function updateInvertedIndex(entryData, entryHash, rootHash, transaction) {
       const existing = event.target.result;
 
       // Create or update the inverted index entry
-      const invertedIndexEntry = existing
-        ? existing
-        : { word, rootHashes: [] };
+      // Handle both old format (entryHashes) and new format (rootHashes)
+      const invertedIndexEntry = existing ? existing : { word, rootHashes: [] };
+
+      // Migrate old format to new format if needed
+      if (invertedIndexEntry.entryHashes && !invertedIndexEntry.rootHashes) {
+        invertedIndexEntry.rootHashes = invertedIndexEntry.entryHashes;
+        delete invertedIndexEntry.entryHashes;
+      }
+
+      // Ensure rootHashes array exists
+      if (!invertedIndexEntry.rootHashes) {
+        invertedIndexEntry.rootHashes = [];
+      }
 
       // Add root hash if not already present
       if (!invertedIndexEntry.rootHashes.includes(rootHash)) {
