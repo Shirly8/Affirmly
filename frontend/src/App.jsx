@@ -92,7 +92,9 @@ function App() {
       try {
         console.log('=== INITIALIZATION STARTED ===');
         console.log('Current URL hash:', window.location.hash);
+        console.log('Calling initDB()...');
         await initDB();
+        console.log('✓ initDB() completed');
 
         const demoV1 = {
           title: "I'm 24 and I constantly feel like I'm a failure",
@@ -121,16 +123,20 @@ function App() {
         };
 
         // Always ensure demo entries exist
+        console.log('About to save demo entries...');
         let v1Result;
         try {
+          console.log('Saving demoV1...');
           v1Result = await saveToStorage(demoV1);
           console.log('✓ V1 created with hash:', v1Result.hash);
 
+          console.log('Saving demoV2 with parent hash:', v1Result.hash);
           await saveToStorage(demoV2, v1Result.hash);
           console.log('✓ V2 created with parent hash:', v1Result.hash);
           console.log('✓ Demo entries created with Merkle chain');
         } catch (demoErr) {
           console.error('✗ Error creating demo entries:', demoErr);
+          console.error('Full error:', demoErr);
           return;
         }
 
