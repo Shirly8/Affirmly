@@ -48,7 +48,7 @@ function App() {
       try {
         await initDB();
 
-        // Always create fresh demo entries
+        // Always create fresh demo entries with fixed timestamps for consistent hash
         {
           const demoV1 = {
             title: "I'm 24 and I constantly feel like I'm a failure",
@@ -60,7 +60,7 @@ function App() {
               "My journey is unique and valuable, unfolding at its own perfect pace.",
             ],
             mood: "neutral",
-            timestamp: new Date(Date.now() - 3600000).toISOString()
+            timestamp: "2025-01-19T10:00:00.000Z"
           };
 
           const demoV2 = {
@@ -73,7 +73,7 @@ function App() {
               "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
             ],
             mood: "neutral",
-            timestamp: new Date(Date.now() - 1800000).toISOString()
+            timestamp: "2025-01-19T11:00:00.000Z"
           };
 
           try {
