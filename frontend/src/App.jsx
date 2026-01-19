@@ -57,8 +57,6 @@ function App() {
               "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
               "I am exactly where I need to be at this moment, and I trust the timing of my life.",
               "My journey is unique and valuable, unfolding at its own perfect pace.",
-              "I choose progress over perfection, and I celebrate every step forward.",
-              "My worth is not determined by my age or achievements.",
             ],
             mood: "neutral",
             timestamp: new Date(Date.now() - 3600000).toISOString()
@@ -72,8 +70,6 @@ function App() {
               "My past does not define my future. Today is a new opportunity to grow.",
               "I trust in my resilience and my ability to create the life I desire.",
               "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
-              "I release the need to compare and embrace gratitude for my unique path.",
-              "Every setback is setting me up for a comeback that is uniquely mine.",
             ],
             mood: "neutral",
             timestamp: new Date(Date.now() - 1800000).toISOString()
