@@ -48,8 +48,12 @@ function App() {
       try {
         await initDB();
 
-        // Always create fresh demo entries with fixed timestamps for consistent hash
-        {
+        // Check if there's an entry hash in the URL first
+        const hash = window.location.hash;
+        const hasEntryHash = hash.startsWith('#/entry/');
+
+        // Only create demo if there's no URL hash
+        if (!hasEntryHash) {
           const demoV1 = {
             title: "I'm 24 and I constantly feel like I'm a failure",
             description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
@@ -80,7 +84,7 @@ function App() {
             const v1Result = await saveToStorage(demoV1);
             console.log('V1 created with hash:', v1Result.hash);
 
-            const v2Result = await saveToStorage(demoV2, v1Result.hash);
+            await saveToStorage(demoV2, v1Result.hash);
             console.log('V2 created with parent hash:', v1Result.hash);
             console.log('Demo entries created with Merkle chain');
 
@@ -103,16 +107,15 @@ function App() {
           } catch (demoErr) {
             console.error('Error creating demo entries:', demoErr);
           }
-        }
-
-        // Check if there's an entry hash in the URL
-        const hash = window.location.hash;
-        if (hash.startsWith('#/entry/')) {
+        } else {
+          // Load entry from URL
           const entryHash = hash.substring('#/entry/'.length);
           try {
             const entry = await getEntryByHash(entryHash);
             if (entry) {
               await viewEntryDetails(entry);
+            } else {
+              console.warn('Entry not found for hash:', entryHash);
             }
           } catch (err) {
             console.error('Error loading entry from URL:', err);
