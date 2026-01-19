@@ -1,57 +1,59 @@
-# 📓Affirmly: Therapeutic Journalling with LLM model
+# Affirmly
 
-## Demonstration
-Affirmly is designed to empower users through personalized affirmations combined with journaling.
+Therapeutic journaling with AI affirmations, Elasticsearch-like search, and Git-like version control.
 
-![Alt text](https://github.com/Shirly8/Affirmly/blob/547bcd8ad078a4bcb778d4ba582a8d4d6cededf9/Affirmly.gif)
+## Features
 
+- **Journal + Affirmations**: Write entry → get 10 personalized affirmations from Gemini
+- **Instant Search**: Elasticsearch-like inverted index for O(1) keyword search
+- **Version History**: Merkle tree tracks changes like Git
+- **Content-Addressed**: SHA-256 hashing, built-in deduplication
+- **Offline-First**: All data in browser IndexedDB
+- **No Backend DB**: Pure frontend architecture
 
-## 🤔 Pain Points and Challenges
-1. **Generic Journalling**: Many journalling apps are simply for journalling. It fails to address issues or responses that resonate with the user's unique circumstances.
+## Architecture
 
-2. **Lack of Affirmations**:  Affirmations are positive, powerful and motivational statements that can help individuals challenge and overcome negative thoughts. They serve as a tool for self-improvement by reinforcing positive beliefs and fostering a constructive mindset.
+```mermaid
+graph TB
+    User["👤 User"]
 
-- **Why Do Affirmations Matter?** 🤔  
-Research shows that affirmations can activate brain areas associated with self-related processing and reward, making it easier to set a positive self-image and counteract negative thinking. Affirmations are easier to remember and repeat than complex motivational strategies, which can be beneficial for daily practice.
+    User -->|"1. Write Journal"| FrontEnd["⚛️ React Frontend<br/>App.jsx"]
 
-3. **Lack of Interactivity**: Traditional journaling apps often lack interactivity, leaving users without opportunities for real-time feedback or community support. Many people turn to online communities or social media to vent their feelings and seek support, which can be fragmented and less personal.
+    FrontEnd -->|"2. Click Send"| WisestAPI["🌐 Wisest Backend<br/>POST /affirmations"]
 
-### 🌟 Innovative Solutions
-1. **Tailored Affirmations**: Affirmly generates affirmations based on user's specific journal entries, ensuring relevance and impact
-2. **Quick access of affirmations**: Affirmly not only allows users to save their journal entries, but also affirmations that could be retrieved for re-assurance, repeitions and daily practice
-3. **User-Friendly Design**: The intuitive interface and seamless saving process make journaling and organizing entries effortless.
+    WisestAPI -->|"3. Prompt"| Gemini["✨ Google Gemini API<br/>Generate 10 Affirmations"]
 
+    Gemini -->|"4. Response"| WisestAPI
+    WisestAPI -->|"5. JSON Array"| FrontEnd
 
-### Prototyped on Figma
-![Alt text](https://github.com/Shirly8/Affirmly/blob/1bc07ccce2f1b3cdbb57973f3423d81f2729ef43/Affirmly.png)
+    FrontEnd -->|"6. Display & Select"| User
 
+    User -->|"7. Heart Favorites"| FrontEnd
 
-## 🛠 Technologies and Frameworks Used
-1. React
-2. Vue.js
-3. Flask
-4. Python
-5. Ollama API
-6. Phi-3 - LLM developed by Microsoft
-7. SQLite
-8. Node.js/Express.js
+    FrontEnd -->|"8. Save Entry"| Storage["💾 IndexedDB Storage"]
 
+    Storage -->|"Hash + Index"| Entries["📝 Entries Store<br/>Key: SHA-256 hash"]
+    Storage -->|"Version Chain"| MerkleTree["🔗 Merkle Tree<br/>parentHash links"]
+    Storage -->|"Word Mapping"| InvertedIndex["🔍 Inverted Index<br/>word → hashes"]
 
+    FrontEnd -->|"9. Search Query"| InvertedIndex
+    InvertedIndex -->|"10. Fast Lookup"| Entries
+    Entries -->|"11. Results"| FrontEnd
+```
 
-## 🚀 Getting Started
-Ensure you have Ollama, specifically the Phi-3 model installed
-1. ```bash
-   git clone https://github.com/Shirly8/affirmly.git
-   cd affirmly
+## Stack
 
-   
-2. ```bash
-   cd frontend
-   npm install
-   npm run dev
+- **Frontend**: React + Vite + IndexedDB + Web Crypto
+- **Backend**: Flask + Google Gemini 2.5 Flash
+- **Storage**: 3 IndexedDB stores (entries, merkle tree, inverted index)
 
-3.  ```bash
-    install [dependencies]
-    python init_db.py
-    python OllamaAPI.py
+## Key Files
 
+- `frontend/src/storage.js` - IndexedDB operations + search
+- `frontend/src/crypto.js` - SHA-256 hashing
+- `frontend/src/App.jsx` - React UI
+- `Wisest/backend/api.py` - `/affirmations` endpoint
+
+## See Also
+
+- `ARCHITECTURE.md` - Technical deep-dive

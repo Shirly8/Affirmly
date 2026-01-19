@@ -24,6 +24,10 @@ def classify_message():
     title = data.get("title", "")
     description = data.get("description", "")
 
+    # Input validation
+    if not title or not description:
+        return jsonify({"error": "Title and description are required"}), 400
+
     # Construct the prompt
     prompt = f'''
     You are an affirmation generator. Generate a list of 10 affirmations based on the following.
@@ -31,15 +35,15 @@ def classify_message():
     Title: "{title}"
     Description: "{description}"
 
-    Based on the title and description, generate realistic but meaningful affirmations, encouraging yet realistic quotes or advice to uplift, motivate or help the individual who wrote this. 
+    Based on the title and description, generate realistic but meaningful affirmations, encouraging yet realistic quotes or advice to uplift, motivate or help the individual who wrote this.
     Each response MUST be 1-3 sentences.
     These quotes or affirmations should be unique to the title and description and address the specific feelings and situation mentioned.
 
     Now generate 10 unique affirmations, quotes, or advice in a list like this:
-    1. 
+    1.
     2.
 
-    Do not generate anything else. Just the list of 10 affirmations. 
+    Do not generate anything else. Just the list of 10 affirmations.
     '''
 
     # Send request to Ollama API
