@@ -270,7 +270,8 @@ function App() {
 
           <div className="AffirmlySays">
             <img src={affirmlyIcon} className="affirmlylogo"></img>
-            <h2>Affirmly Says {loading && <span>{loadingDots}</span>}</h2>
+            <h2>Affirmly Says</h2>
+            {loading && <img src={affirmlyIcon} className="affirmlylogo spinning" alt="Loading" />}
           </div>
 
           {/* Affirmations generation */}

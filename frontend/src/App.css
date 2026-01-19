@@ -96,12 +96,33 @@ body {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
 
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinning {
+  animation: spin 1.5s linear infinite;
+  display: inline-block;
+  margin-top: 1rem;
+}
+
 .title-box, .description-box {
   border: none;
   background-color: rgba(255, 255, 255, 0.63);
   border-radius: 5px;
   font-family: 'Poppins', san-serif;
   width: 90%;
+  color: #666;
+}
+
+.title-box::placeholder,
+.description-box::placeholder {
+  color: #999;
 }
 
 .title-box{
@@ -174,13 +195,17 @@ body {
 
 .AffirmlySays {
   display: flex;
-  gap: 10px;
-  justify-content: left;
-  padding: 0% 5%;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  justify-content: center;
+  padding: 1rem 0;
+  margin: 2rem 0;
 }
 
 .affirmlylogo {
-  width:50px;
+  width: 50px;
+  height: 50px;
 }
 
 h2 {
