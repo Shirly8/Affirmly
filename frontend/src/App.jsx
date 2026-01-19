@@ -102,6 +102,12 @@ function App() {
       await saveToStorage(entryData);
       showMessage(`Entry saved: "${title}"`);
       showPopup(true);
+
+      // Clear form for new entry
+      setTitle("");
+      setDescription("");
+      setAffirmations([]);
+      setHeartClicked({});
     } catch (error) {
       console.error('Error saving entry:', error);
     }
