@@ -262,7 +262,7 @@ function App() {
           <span className="tooltip">New Entry</span>
         </div>
         <img src={viteLogo} className="logo" alt="Vite Logo" />
-        <div className="search icon-btn" onClick={() => setShowSearch(!showSearch)} title="Search Entries">
+        <div className="search icon-btn" onClick={viewEntries} title="Search Entries">
           <span className="tooltip">Search Entries</span>
         </div>
       </div>
