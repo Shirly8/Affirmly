@@ -514,7 +514,7 @@ function App() {
             <div className="sidebar-content">
               <div className="sidebar-section">
                 <h3>Favorited Affirmations</h3>
-                {viewingEntry.content.affirmations.map((aff, idx) => (
+                {viewingEntry.content.affirmations.slice(0, 3).map((aff, idx) => (
                   <div key={idx} className="sidebar-affirmation-container">
                     <div
                       className="sidebar-heart"
