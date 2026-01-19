@@ -465,6 +465,120 @@ h2 {
   color: #7C7B7F;
 }
 
+.entry-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.edit-button {
+  background-color: rgba(97, 218, 251, 0.4);
+  border: 2px solid #61dafbaa;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.edit-button:hover {
+  background-color: rgba(97, 218, 251, 0.7);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(97, 218, 251, 0.3);
+}
+
+.merkle-chain {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(97, 218, 251, 0.1) 0%, rgba(97, 218, 251, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(97, 218, 251, 0.3);
+}
+
+.merkle-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(97, 218, 251, 0.1) 100%);
+  border: 2px solid #61dafbaa;
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.merkle-node:hover {
+  background: linear-gradient(135deg, rgba(97, 218, 251, 0.2) 0%, rgba(97, 218, 251, 0.15) 100%);
+  box-shadow: 0 0 15px rgba(97, 218, 251, 0.4);
+  transform: scale(1.02);
+}
+
+.version-number {
+  font-size: 18px;
+  font-weight: bold;
+  color: #61dafbaa;
+  letter-spacing: 2px;
+}
+
+.node-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.version-action {
+  background-color: rgba(97, 218, 251, 0.3);
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: #61dafbaa;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.version-date {
+  color: #999;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.version-hash {
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #61dafbaa;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  word-break: break-all;
+  margin-top: 5px;
+}
+
+.chain-link {
+  color: #61dafbaa;
+  font-size: 20px;
+  font-weight: bold;
+  animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
 .history-section small {
   color: #999;
 }

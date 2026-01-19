@@ -161,6 +161,21 @@ function App() {
     }
   }
 
+  // Edit entry - load it back into the form
+  const editEntry = () => {
+    if (viewingEntry) {
+      setTitle(viewingEntry.content.title);
+      setDescription(viewingEntry.content.description);
+      setAffirmations(viewingEntry.content.affirmations);
+      setHeartClicked(viewingEntry.content.affirmations.reduce((acc, _, idx) => {
+        acc[idx] = true;
+        return acc;
+      }, {}));
+      setViewingEntry(null);
+      setShowSearch(false);
+    }
+  }
+
   // Close popup
   const closePopup = () => {
     showPopup(false);
@@ -237,7 +252,11 @@ function App() {
       ) : viewingEntry ? (
         /* Entry Details View */
         <div className="entry-details-view">
-          <button className="back-button" onClick={() => setViewingEntry(null)}>← Back</button>
+          <div className="entry-actions">
+            <button className="back-button" onClick={() => setViewingEntry(null)}>← Back</button>
+            <button className="edit-button" onClick={editEntry}>✏️ Edit Entry</button>
+          </div>
+
           <h2>{viewingEntry.content.title}</h2>
           <p>{viewingEntry.content.description}</p>
 
@@ -249,10 +268,41 @@ function App() {
           </div>
 
           <div className="history-section">
-            <h3>Entry Hash (SHA-256):</h3>
+            <h3>📋 Current Version Hash (SHA-256):</h3>
             <code className="hash-display">{viewingEntry.hash}</code>
-            <h3>Version History:</h3>
-            <small>Created: {new Date(viewingEntry.timestamp).toLocaleString()}</small>
+
+            <h3>🔗 Merkle Chain History:</h3>
+            <div className="merkle-chain">
+              {entryHistory.filter(h => h.hash === viewingEntry.hash).length > 0 ? (
+                entryHistory
+                  .filter(h => h.hash === viewingEntry.hash ||
+                               entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash))))
+                  .reverse()
+                  .map((version, idx) => (
+                    <div key={version.hash} className="merkle-node">
+                      <div className="version-number">V{idx + 1}</div>
+                      <div className="node-content">
+                        <small className="version-action">{version.action}</small>
+                        <small className="version-date">{new Date(version.timestamp).toLocaleString()}</small>
+                        <code className="version-hash">{version.hash.substring(0, 16)}...</code>
+                      </div>
+                      {idx < entryHistory.filter(h => h.hash === viewingEntry.hash ||
+                                                        entryHistory.some(e => e.parentHash === h.hash && (e.hash === viewingEntry.hash || entryHistory.some(x => x.parentHash === e.hash && x.hash === viewingEntry.hash)))).reverse().length - 1 && (
+                        <div className="chain-link">↓ parent</div>
+                      )}
+                    </div>
+                  ))
+              ) : (
+                <div className="merkle-node">
+                  <div className="version-number">V1</div>
+                  <div className="node-content">
+                    <small className="version-action">created</small>
+                    <small className="version-date">{new Date(viewingEntry.timestamp).toLocaleString()}</small>
+                    <code className="version-hash">{viewingEntry.hash.substring(0, 16)}...</code>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ) : (
