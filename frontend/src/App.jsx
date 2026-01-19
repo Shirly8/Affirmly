@@ -18,6 +18,7 @@ function App() {
   const [showSearch, setShowSearch] = useState(false);
   const [viewingEntry, setViewingEntry] = useState(null);
   const [entryHistory, setEntryHistory] = useState([]);
+  const [editingEntryHash, setEditingEntryHash] = useState(null);  // Track which entry we're editing
 
   // Initialize database on mount
   useEffect(() => {
@@ -139,7 +140,8 @@ function App() {
     };
 
     try {
-      await saveToStorage(entryData);
+      // Pass parent hash if we're editing an existing entry
+      await saveToStorage(entryData, editingEntryHash);
       showMessage(`Entry saved: "${title}"`);
       showPopup(true);
 
@@ -153,6 +155,7 @@ function App() {
       setDescription("");
       setAffirmations([]);
       setHeartClicked({});
+      setEditingEntryHash(null);  // Reset editing hash
     } catch (error) {
       console.error('Error saving entry:', error);
     }
@@ -217,6 +220,7 @@ function App() {
         acc[idx] = true;
         return acc;
       }, {}));
+      setEditingEntryHash(viewingEntry.hash);  // Track that we're editing this entry
       setViewingEntry(null);
       setShowSearch(false);
     }

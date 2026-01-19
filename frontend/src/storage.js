@@ -44,15 +44,17 @@ export async function hashEntry(entry) {
 }
 
 // Save entry to content-addressed storage
-export async function saveEntry(entryData) {
+export async function saveEntry(entryData, parentHash = null) {
   if (!db) await initDB();
 
   const hash = await hashEntry(entryData);
   const timestamp = new Date().toISOString();
 
-  // Get parent hash (previous entry)
-  const lastMerkleEntry = await getLastMerkleEntry();
-  const parentHash = lastMerkleEntry ? lastMerkleEntry.hash : null;
+  // If no parent hash provided, get the last entry (for new entries)
+  if (!parentHash) {
+    const lastMerkleEntry = await getLastMerkleEntry();
+    parentHash = lastMerkleEntry ? lastMerkleEntry.hash : null;
+  }
 
   // Save to entries store
   const entry = {
