@@ -12,29 +12,40 @@ let db = null;
 // Initialize IndexedDB
 export async function initDB() {
   return new Promise((resolve, reject) => {
+    console.log('[storage.js] Opening IndexedDB, DB_NAME=' + DB_NAME + ', version=2');
     const request = indexedDB.open(DB_NAME, 2);
 
-    request.onerror = () => reject(request.error);
+    request.onerror = () => {
+      console.error('[storage.js] indexedDB.open() error:', request.error);
+      reject(request.error);
+    };
+
     request.onsuccess = () => {
+      console.log('[storage.js] indexedDB.open() success, resolving');
       db = request.result;
       resolve(db);
     };
 
     request.onupgradeneeded = (event) => {
+      console.log('[storage.js] onupgradeneeded called');
       const database = event.target.result;
 
       // Clear all stores on schema upgrade to handle migration
       const storeNames = Array.from(database.objectStoreNames);
+      console.log('[storage.js] Existing stores:', storeNames);
       storeNames.forEach(storeName => {
         if (database.objectStoreNames.contains(storeName)) {
+          console.log('[storage.js] Deleting store:', storeName);
           database.deleteObjectStore(storeName);
         }
       });
 
       // Create fresh stores
+      console.log('[storage.js] Creating fresh stores');
       database.createObjectStore(ENTRIES_STORE, { keyPath: 'hash' });
       database.createObjectStore(MERKLE_TREE_STORE, { keyPath: 'hash' });
       database.createObjectStore(INVERTED_INDEX_STORE, { keyPath: 'word' });
+      console.log('[storage.js] Stores created');
     };
   });
 }
