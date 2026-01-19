@@ -692,8 +692,8 @@ h2 {
 
 /* Update Save Button */
 .save-button {
-  width: 100%;
-  margin: 25px auto 0;
+  width: 90%;
+  margin: 0 auto 20px;
   padding: 14px 20px;
   background-color: white;
   color: #333;
@@ -855,7 +855,7 @@ h2 {
 .sidebar-merkle-chain {
   display: flex;
   flex-direction: column;
-  gap: 35px;
+  gap: 12px;
 }
 
 .sidebar-merkle-node {
@@ -884,10 +884,9 @@ h2 {
 .sidebar-merkle-node::after {
   content: '🔗';
   position: absolute;
-  bottom: -28px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 24px;
+  top: 8px;
+  left: 8px;
+  font-size: 20px;
   opacity: 0.6;
   z-index: 0;
 }

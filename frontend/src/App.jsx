@@ -639,6 +639,17 @@ function App() {
             )}
           </div>
 
+          {/* Save Entry Button - appears above Affirmly Says */}
+          {affirmations.length > 0 && (
+            <button
+              className="save-button"
+              onClick={autoSaveEntry}
+              disabled={Object.values(heartClicked).filter(Boolean).length === 0}
+            >
+              Save Entry
+            </button>
+          )}
+
           <div className="AffirmlySays">
             {loading ? (
               <img src={affirmlyIcon} className="affirmlylogo spinning" alt="Loading" />
@@ -660,15 +671,6 @@ function App() {
                   />
                 </div>
               ))}
-              <div>
-              <button
-                className="save-button"
-                onClick={autoSaveEntry}
-                disabled={Object.values(heartClicked).filter(Boolean).length === 0}
-              >
-                Save Entry
-              </button>
-              </div>
             </div>
           )}
         </div>
