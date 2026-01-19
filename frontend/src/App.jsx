@@ -41,20 +41,41 @@ function App() {
   const debugCheckEntry = async (hash) => {
     console.log('=== MANUAL DEBUG: Checking entry ===');
     try {
+      console.log('Initializing DB...');
       await initDB();
+      console.log('Getting entry by hash:', hash);
       const entry = await getEntryByHash(hash);
       console.log('Entry retrieved:', entry);
       if (entry) {
-        console.log('✓ Entry found!');
+        console.log('%c✓ Entry FOUND!', 'color: green; font-weight: bold; font-size: 14px;');
         console.log('- Hash:', entry.hash);
         console.log('- Root Hash:', entry.rootHash);
         console.log('- Title:', entry.content.title);
         console.log('- Affirmations count:', entry.content.affirmations.length);
+        return entry;
       } else {
-        console.log('✗ Entry NOT found in database');
+        console.log('%c✗ Entry NOT found in database', 'color: red; font-weight: bold; font-size: 14px;');
+        return null;
       }
     } catch (err) {
       console.error('✗ Error checking entry:', err);
+      return null;
+    }
+  };
+
+  // Debug function to list all entries in database
+  const debugListAllEntries = async () => {
+    console.log('=== DEBUG: Listing all entries ===');
+    try {
+      await initDB();
+      const allEntries = await getAllEntries();
+      console.log(`Found ${allEntries.length} total entries in database`);
+      allEntries.forEach((entry, idx) => {
+        console.log(`[${idx}] Hash: ${entry.hash.substring(0, 16)}... | Root: ${entry.rootHash?.substring(0, 16)}... | Title: ${entry.content.title.substring(0, 30)}...`);
+      });
+      return allEntries;
+    } catch (err) {
+      console.error('✗ Error listing entries:', err);
     }
   };
 
@@ -62,6 +83,7 @@ function App() {
   if (typeof window !== 'undefined') {
     window.clearAffirmlyDB = clearDatabase;
     window.debugCheckEntry = debugCheckEntry;
+    window.debugListAllEntries = debugListAllEntries;
   }
 
   // Initialize database and handle URL routing
