@@ -757,8 +757,8 @@ h2 {
 
 .sidebar-header {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: flex-end;
+  align-items: center;
   margin-bottom: 20px;
   gap: 10px;
 }

@@ -347,7 +347,6 @@ function App() {
         {viewingEntry && (
           <div className="left-sidebar">
             <div className="sidebar-header">
-              <h2>{viewingEntry.content.title}</h2>
               <button
                 className="close-sidebar-btn"
                 onClick={() => {
@@ -365,7 +364,6 @@ function App() {
                 <h3>Favorited Affirmations</h3>
                 {viewingEntry.content.affirmations.map((aff, idx) => (
                   <div key={idx} className="sidebar-affirmation-container">
-                    <p className="sidebar-affirmation">{aff}</p>
                     <div
                       className="sidebar-heart"
                       onClick={() => {
@@ -386,6 +384,7 @@ function App() {
                     >
                       ❤️
                     </div>
+                    <p className="sidebar-affirmation">{aff}</p>
                   </div>
                 ))}
               </div>
