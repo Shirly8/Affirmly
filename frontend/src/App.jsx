@@ -273,18 +273,18 @@ function App() {
       return acc;
     }, {}));
 
-    // Update URL to point to this entry
-    window.location.hash = `#/entry/${entry.hash}`;
-
     try {
       const history = await getMerkleTree();
       setEntryHistory(history);
 
-      // Calculate version number for this entry
+      // Calculate version number and use root hash for URL
       const rootHash = entry.rootHash || entry.hash;
       const versionsOfThisEntry = history.filter(h => h.rootHash === rootHash);
       const versionNum = versionsOfThisEntry.length;
       setCurrentVersion({ versionNum, rootHash });
+
+      // Update URL to point to root entry (original/created version)
+      window.location.hash = `#/entry/${rootHash}`;
     } catch (error) {
       console.error('Error loading history:', error);
     }
