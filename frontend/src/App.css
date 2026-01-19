@@ -555,8 +555,14 @@ h2 {
   border-radius: 8px;
   position: relative;
   transition: all 0.3s ease;
-  width: calc(33.333% - 10px);
-  min-width: 150px;
+  width: calc(25% - 11.25px);
+  min-width: 120px;
+}
+
+@media (max-width: 1200px) {
+  .merkle-node {
+    width: calc(33.333% - 10px);
+  }
 }
 
 @media (max-width: 900px) {
