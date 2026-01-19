@@ -218,25 +218,42 @@ h2 {
 }
 
 .affirmations-container {
-  display:flex;
-  flex-wrap:wrap;
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  padding: 0% 5%;
-  max-height: 60vh;
+  gap: 15px;
+  padding: 20px 5%;
+  max-height: 50vh;
+  margin-top: -15px;
 }
 
 .individual-affirmations {
   display: flex;
   border: 2px solid white;
   background-color: rgba(255, 255, 255, 0.30);
-  padding: 0px;
+  padding: 15px;
   border-radius: 5px;
   position: relative;
-  font-size: 20px;
+  font-size: 16px;
   color: gray;
-  font-family: 'Times New Roman Condensed', Times, serif; 
-  width: 50vh
+  font-family: 'Times New Roman Condensed', Times, serif;
+  width: calc(33.333% - 10px);
+  min-height: 120px;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1200px) {
+  .individual-affirmations {
+    width: calc(50% - 7.5px);
+  }
+}
+
+@media (max-width: 768px) {
+  .individual-affirmations {
+    width: 100%;
+  }
 }
 
 .heart-icon {
@@ -470,9 +487,29 @@ h2 {
   margin-bottom: 20px;
 }
 
+.back-button {
+  background-color: white;
+  color: #333;
+  border: 2px solid white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.back-button:hover {
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
 .edit-button {
-  background-color: rgba(97, 218, 251, 0.4);
-  border: 2px solid #61dafbaa;
+  background-color: white;
+  border: 2px solid white;
   color: #333;
   padding: 10px 20px;
   border-radius: 5px;
@@ -480,23 +517,28 @@ h2 {
   font-size: 16px;
   font-weight: bold;
   transition: all 0.3s ease;
+  height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .edit-button:hover {
-  background-color: rgba(97, 218, 251, 0.7);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(97, 218, 251, 0.3);
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
 }
 
 .merkle-chain {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   gap: 15px;
   margin-top: 15px;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(97, 218, 251, 0.1) 0%, rgba(97, 218, 251, 0.05) 100%);
+  background-color: rgba(200, 220, 240, 0.25);
   border-radius: 8px;
-  border: 1px solid rgba(97, 218, 251, 0.3);
+  border: 2px solid rgba(97, 218, 251, 0.5);
+  justify-content: center;
 }
 
 .merkle-node {
@@ -510,6 +552,20 @@ h2 {
   border-radius: 8px;
   position: relative;
   transition: all 0.3s ease;
+  width: calc(33.333% - 10px);
+  min-width: 150px;
+}
+
+@media (max-width: 900px) {
+  .merkle-node {
+    width: calc(50% - 7.5px);
+  }
+}
+
+@media (max-width: 600px) {
+  .merkle-node {
+    width: 100%;
+  }
 }
 
 .merkle-node:hover {
@@ -563,10 +619,7 @@ h2 {
 }
 
 .chain-link {
-  color: #61dafbaa;
-  font-size: 20px;
-  font-weight: bold;
-  animation: bounce 1.5s infinite;
+  display: none;
 }
 
 @keyframes bounce {
@@ -604,12 +657,23 @@ h2 {
 
 /* Update Save Button */
 .save-button {
-  margin-top: 15px;
+  width: 90%;
+  margin: 20px auto 0;
+  padding: 12px 20px;
+  background-color: white;
+  color: #333;
+  border: 2px solid white;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  background:rgba(0, 0, 0, 0.4);
-  color: white;
+}
+
+.save-button:hover:not(:disabled) {
+  background-color: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .save-button:disabled {
