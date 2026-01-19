@@ -87,7 +87,7 @@ function App() {
             console.log('V2 created with parent hash:', v1Result.hash);
             console.log('Demo entries created with Merkle chain');
 
-            // Pre-fill form with demo V1 affirmations
+            // Pre-fill form with demo V1 affirmations and show sidebar for showcase
             setTitle(demoV1.title);
             setDescription(demoV1.description);
             setAffirmations(demoV1.affirmations);
@@ -95,6 +95,14 @@ function App() {
               acc[idx] = true;
               return acc;
             }, {}));
+
+            // Set viewing entry to show sidebar by default for showcase
+            setViewingEntry({
+              hash: v1Result.hash,
+              content: demoV1,
+              timestamp: demoV1.timestamp
+            });
+            setEditingEntryHash(v1Result.hash);
           } catch (demoErr) {
             console.error('Error creating demo entries:', demoErr);
           }
