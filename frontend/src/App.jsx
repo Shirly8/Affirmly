@@ -89,40 +89,74 @@ function App() {
   // Initialize database and handle URL routing
   useEffect(() => {
     const init = async () => {
+      // Demo data definition - available immediately, no DB required
+      const demoV1 = {
+        title: "I'm 24 and I constantly feel like I'm a failure",
+        description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
+        affirmations: [
+          "Comparison is the thief of joy. I embrace my journey and celebrate the successes of others without diminishing my own.",
+          "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
+          "I am exactly where I need to be at this moment, and I trust the timing of my life.",
+          "My journey is unique and valuable, unfolding at its own perfect pace.",
+        ],
+        mood: "neutral",
+        timestamp: "2025-01-19T10:00:00.000Z"
+      };
+
+      const demoV2 = {
+        title: "I'm 24 and I constantly feel like I'm a failure",
+        description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
+        affirmations: [
+          "I am building a life that is authentically mine, not a copy of someone else's.",
+          "My past does not define my future. Today is a new opportunity to grow.",
+          "I trust in my resilience and my ability to create the life I desire.",
+          "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
+        ],
+        mood: "neutral",
+        timestamp: "2025-01-19T11:00:00.000Z"
+      };
+
+      // Hardcoded demo hash for the known demo entry (matches the hash in URL)
+      const DEMO_HASH = 'f441e69a0080569f22da7e2138c1e4f7eddb3e5db1131d41c95032d13ec20fdd';
+
+      // Check URL hash FIRST - before any DB operations
+      const hash = window.location.hash;
+      console.log('=== INITIALIZATION STARTED ===');
+      console.log('Current URL hash:', hash);
+      const hasEntryHash = hash.startsWith('#/entry/');
+      const entryHash = hasEntryHash ? hash.substring('#/entry/'.length) : null;
+
+      // If URL matches demo hash, show demo immediately without waiting for DB
+      if (entryHash === DEMO_HASH) {
+        console.log('✓ URL matches demo hash, showing demo immediately');
+        setTitle(demoV1.title);
+        setDescription(demoV1.description);
+        setAffirmations(demoV1.affirmations);
+        setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
+          acc[idx] = true;
+          return acc;
+        }, {}));
+        setViewingEntry({
+          hash: DEMO_HASH,
+          rootHash: DEMO_HASH,
+          content: demoV1,
+          timestamp: demoV1.timestamp
+        });
+        // Set mock history for demo
+        setEntryHistory([
+          { hash: DEMO_HASH, parentHash: null, timestamp: demoV1.timestamp, action: 'created', rootHash: DEMO_HASH }
+        ]);
+        setCurrentVersion({ versionNum: 1, rootHash: DEMO_HASH });
+        console.log('✓ Demo displayed without DB');
+      }
+
+      // Now initialize DB in background (non-blocking for demo URL)
       try {
-        console.log('=== INITIALIZATION STARTED ===');
-        console.log('Current URL hash:', window.location.hash);
         console.log('Calling initDB()...');
         await initDB();
         console.log('✓ initDB() completed');
 
-        const demoV1 = {
-          title: "I'm 24 and I constantly feel like I'm a failure",
-          description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
-          affirmations: [
-            "Comparison is the thief of joy. I embrace my journey and celebrate the successes of others without diminishing my own.",
-            "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
-            "I am exactly where I need to be at this moment, and I trust the timing of my life.",
-            "My journey is unique and valuable, unfolding at its own perfect pace.",
-          ],
-          mood: "neutral",
-          timestamp: "2025-01-19T10:00:00.000Z"
-        };
-
-        const demoV2 = {
-          title: "I'm 24 and I constantly feel like I'm a failure",
-          description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
-          affirmations: [
-            "I am building a life that is authentically mine, not a copy of someone else's.",
-            "My past does not define my future. Today is a new opportunity to grow.",
-            "I trust in my resilience and my ability to create the life I desire.",
-            "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
-          ],
-          mood: "neutral",
-          timestamp: "2025-01-19T11:00:00.000Z"
-        };
-
-        // Always ensure demo entries exist
+        // Save demo entries to DB
         console.log('About to save demo entries...');
         let v1Result;
         try {
@@ -136,26 +170,24 @@ function App() {
           console.log('✓ Demo entries created with Merkle chain');
         } catch (demoErr) {
           console.error('✗ Error creating demo entries:', demoErr);
-          console.error('Full error:', demoErr);
-          return;
+          // Don't return - continue with demo display
         }
 
-        // Check if there's an entry hash in the URL
-        const hash = window.location.hash;
-        console.log('Checking URL hash:', hash);
-        const hasEntryHash = hash.startsWith('#/entry/');
-        console.log('Has entry hash:', hasEntryHash);
-
-        if (hasEntryHash) {
-          // Load entry from URL - but don't call viewEntryDetails to avoid hash loop
-          const entryHash = hash.substring('#/entry/'.length);
+        // If we already showed demo from URL, update with real DB data if available
+        if (entryHash === DEMO_HASH && v1Result) {
+          console.log('Updating demo with DB data');
+          const history = await getMerkleTree();
+          setEntryHistory(history);
+          const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
+          setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
+        } else if (hasEntryHash && entryHash !== DEMO_HASH) {
+          // Load non-demo entry from URL
           console.log('Attempting to load entry from URL with hash:', entryHash);
           try {
             const entry = await getEntryByHash(entryHash);
             console.log('✓ Query result:', entry);
             if (entry) {
               console.log('✓ Entry found in database');
-              // Load entry data directly into form without calling viewEntryDetails
               const entryWithRoot = {
                 ...entry,
                 rootHash: entry.rootHash || entry.hash
@@ -165,7 +197,6 @@ function App() {
               setShowSearch(false);
               setEditingEntryHash(entry.hash);
 
-              // Load entry data into form
               setTitle(entry.content.title);
               setDescription(entry.content.description);
               setAffirmations(entry.content.affirmations);
@@ -174,7 +205,6 @@ function App() {
                 return acc;
               }, {}));
 
-              // Load history
               const history = await getMerkleTree();
               setEntryHistory(history);
               const rootHash = entry.rootHash || entry.hash;
@@ -195,21 +225,20 @@ function App() {
                 return acc;
               }, {}));
               setViewingEntry({
-                hash: v1Result.hash,
-                rootHash: v1Result.hash,
+                hash: v1Result?.hash || DEMO_HASH,
+                rootHash: v1Result?.hash || DEMO_HASH,
                 content: demoV1,
                 timestamp: demoV1.timestamp
               });
               const history = await getMerkleTree();
               setEntryHistory(history);
-              const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
-              setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
-              // Don't set URL hash for fallback - keep URL clean
+              const versionsOfThisEntry = history.filter(h => h.rootHash === (v1Result?.hash || DEMO_HASH));
+              setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result?.hash || DEMO_HASH });
             }
           } catch (err) {
             console.error('✗ Error loading entry from URL:', err);
           }
-        } else {
+        } else if (!hasEntryHash) {
           // No URL hash - display demo without changing URL
           console.log('No URL hash detected, showing demo');
           setTitle(demoV1.title);
@@ -220,20 +249,37 @@ function App() {
             return acc;
           }, {}));
           setViewingEntry({
-            hash: v1Result.hash,
-            rootHash: v1Result.hash,
+            hash: v1Result?.hash || DEMO_HASH,
+            rootHash: v1Result?.hash || DEMO_HASH,
             content: demoV1,
             timestamp: demoV1.timestamp
           });
           const history = await getMerkleTree();
           setEntryHistory(history);
-          const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
-          setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
-          // Don't set URL hash for demo - keep main site URL clean
+          const versionsOfThisEntry = history.filter(h => h.rootHash === (v1Result?.hash || DEMO_HASH));
+          setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result?.hash || DEMO_HASH });
         }
         console.log('=== INITIALIZATION COMPLETED ===');
       } catch (err) {
         console.error('✗ Failed to initialize DB:', err);
+        // Even if DB fails, show demo if URL matches
+        if (!viewingEntry && !hasEntryHash) {
+          console.log('DB failed, showing demo as fallback');
+          setTitle(demoV1.title);
+          setDescription(demoV1.description);
+          setAffirmations(demoV1.affirmations);
+          setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
+            acc[idx] = true;
+            return acc;
+          }, {}));
+          setViewingEntry({
+            hash: DEMO_HASH,
+            rootHash: DEMO_HASH,
+            content: demoV1,
+            timestamp: demoV1.timestamp
+          });
+          setCurrentVersion({ versionNum: 1, rootHash: DEMO_HASH });
+        }
       }
     };
     init();
