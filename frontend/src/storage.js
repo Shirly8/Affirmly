@@ -159,24 +159,34 @@ function tokenize(text) {
     .match(/\b\w+\b/g) || [];
 }
 
-// Update inverted index
+// Update inverted index - properly handle async operations within transaction
 function updateInvertedIndex(entryData, entryHash, transaction) {
   const words = tokenize(entryData.title + ' ' + entryData.description);
   const uniqueWords = [...new Set(words)];
+  const objectStore = transaction.objectStore(INVERTED_INDEX_STORE);
 
   uniqueWords.forEach((word) => {
-    const objectStore = transaction.objectStore(INVERTED_INDEX_STORE);
     const getRequest = objectStore.get(word);
 
-    getRequest.onsuccess = () => {
-      const existing = getRequest.result || { word, entryHashes: [] };
+    getRequest.onsuccess = (event) => {
+      const existing = event.target.result;
+
+      // Create or update the inverted index entry
+      const invertedIndexEntry = existing
+        ? existing
+        : { word, entryHashes: [] };
 
       // Add hash if not already present
-      if (!existing.entryHashes.includes(entryHash)) {
-        existing.entryHashes.push(entryHash);
+      if (!invertedIndexEntry.entryHashes.includes(entryHash)) {
+        invertedIndexEntry.entryHashes.push(entryHash);
       }
 
-      objectStore.put(existing);
+      // Put back into store
+      objectStore.put(invertedIndexEntry);
+    };
+
+    getRequest.onerror = () => {
+      console.error('Error getting inverted index entry for word:', word);
     };
   });
 }
