@@ -204,13 +204,13 @@ function App() {
               setEntryHistory(history);
               const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
               setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
-              window.location.hash = `#/entry/${v1Result.hash}`;
+              // Don't set URL hash for fallback - keep URL clean
             }
           } catch (err) {
             console.error('✗ Error loading entry from URL:', err);
           }
         } else {
-          // No URL hash - display demo
+          // No URL hash - display demo without changing URL
           console.log('No URL hash detected, showing demo');
           setTitle(demoV1.title);
           setDescription(demoV1.description);
@@ -229,7 +229,7 @@ function App() {
           setEntryHistory(history);
           const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
           setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
-          window.location.hash = `#/entry/${v1Result.hash}`;
+          // Don't set URL hash for demo - keep main site URL clean
         }
         console.log('=== INITIALIZATION COMPLETED ===');
       } catch (err) {
