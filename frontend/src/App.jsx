@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import affirmlyLogo from './assets/icon/2.svg'
-import searchIcon from './assets/icon/3.svg'
-import newEntryIcon from './assets/icon/4.svg'
+import viteLogo from './assets/images/3.png'
 import affirmlyIcon from './assets/icon/2.svg'
 
 import './App.css'
@@ -189,16 +187,12 @@ function App() {
     <>
       {/* Top menu bar */}
       <div className="topmenu">
-        <img src={affirmlyLogo} className="logo" alt="Affirmly" />
-        <div className="icon-group">
-          <div className="icon-btn search-btn-icon" onClick={() => setShowSearch(!showSearch)} title="Search Entries">
-            <img src={searchIcon} alt="Search" />
-            <span className="tooltip">Search Entries</span>
-          </div>
-          <div className="icon-btn new-entry-btn-icon" onClick={newEntry} title="New Entry">
-            <img src={newEntryIcon} alt="New Entry" />
-            <span className="tooltip">New Entry</span>
-          </div>
+        <div className="bar icon-btn" onClick={newEntry} title="New Entry">
+          <span className="tooltip">New Entry</span>
+        </div>
+        <img src={viteLogo} className="logo" alt="Vite Logo" />
+        <div className="search icon-btn" onClick={() => setShowSearch(!showSearch)} title="Search Entries">
+          <span className="tooltip">Search Entries</span>
         </div>
       </div>
 
