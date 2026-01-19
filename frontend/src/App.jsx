@@ -37,9 +37,31 @@ function App() {
     }
   };
 
+  // Debug function to manually check entry loading
+  const debugCheckEntry = async (hash) => {
+    console.log('=== MANUAL DEBUG: Checking entry ===');
+    try {
+      await initDB();
+      const entry = await getEntryByHash(hash);
+      console.log('Entry retrieved:', entry);
+      if (entry) {
+        console.log('✓ Entry found!');
+        console.log('- Hash:', entry.hash);
+        console.log('- Root Hash:', entry.rootHash);
+        console.log('- Title:', entry.content.title);
+        console.log('- Affirmations count:', entry.content.affirmations.length);
+      } else {
+        console.log('✗ Entry NOT found in database');
+      }
+    } catch (err) {
+      console.error('✗ Error checking entry:', err);
+    }
+  };
+
   // Make it globally accessible for debugging
   if (typeof window !== 'undefined') {
     window.clearAffirmlyDB = clearDatabase;
+    window.debugCheckEntry = debugCheckEntry;
   }
 
   // Initialize database and handle URL routing
