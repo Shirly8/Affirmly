@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import affirmlyLogo from './assets/images/Affirmly.gif'
+import viteLogo from './assets/images/3.png'
 import affirmlyIcon from './assets/icon/2.svg'
 
 import './App.css'
@@ -187,8 +187,9 @@ function App() {
     <>
       {/* Top menu bar */}
       <div className="topmenu">
-        <img src={affirmlyLogo} className="logo" alt="Affirmly" />
-        <h1 className="app-title">Affirmly</h1>
+        <div className="bar" onClick={() => console.log("Menu clicked")} />
+        <img src={viteLogo} className="logo" alt="Vite Logo" />
+        <div className="search" onClick={() => setShowSearch(!showSearch)} />
       </div>
 
       {/* Search View */}
@@ -245,14 +246,6 @@ function App() {
       ) : (
         /* Main Journal Entry View */
         <>
-          {/* Action buttons */}
-          <div className="action-buttons">
-            <button className="search-btn" onClick={viewEntries}>🔍 Search Entries</button>
-            {affirmations.length === 0 && title === "" && (
-              <button className="new-entry-btn" onClick={newEntry}>✏️ New Entry</button>
-            )}
-          </div>
-
           {/* Journal Entry */}
           <input
             type="text"
