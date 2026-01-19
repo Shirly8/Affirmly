@@ -19,6 +19,7 @@ function App() {
   const [viewingEntry, setViewingEntry] = useState(null);
   const [entryHistory, setEntryHistory] = useState([]);
   const [editingEntryHash, setEditingEntryHash] = useState(null);  // Track which entry we're editing
+  const [currentVersion, setCurrentVersion] = useState(null);  // Track version number and root hash
 
   // Clear database function for debugging
   const clearDatabase = async () => {
@@ -41,7 +42,7 @@ function App() {
     window.clearAffirmlyDB = clearDatabase;
   }
 
-  // Initialize database on mount
+  // Initialize database and handle URL routing
   useEffect(() => {
     const init = async () => {
       try {
@@ -92,11 +93,29 @@ function App() {
             // Set viewing entry to show sidebar by default for showcase
             setViewingEntry({
               hash: v1Result.hash,
+              rootHash: v1Result.hash,
               content: demoV1,
               timestamp: demoV1.timestamp
             });
+
+            // Update URL to point to this entry
+            window.location.hash = `#/entry/${v1Result.hash}`;
           } catch (demoErr) {
             console.error('Error creating demo entries:', demoErr);
+          }
+        }
+
+        // Check if there's an entry hash in the URL
+        const hash = window.location.hash;
+        if (hash.startsWith('#/entry/')) {
+          const entryHash = hash.substring('#/entry/'.length);
+          try {
+            const entry = await getEntryByHash(entryHash);
+            if (entry) {
+              await viewEntryDetails(entry);
+            }
+          } catch (err) {
+            console.error('Error loading entry from URL:', err);
           }
         }
       } catch (err) {
@@ -254,9 +273,18 @@ function App() {
       return acc;
     }, {}));
 
+    // Update URL to point to this entry
+    window.location.hash = `#/entry/${entry.hash}`;
+
     try {
       const history = await getMerkleTree();
       setEntryHistory(history);
+
+      // Calculate version number for this entry
+      const rootHash = entry.rootHash || entry.hash;
+      const versionsOfThisEntry = history.filter(h => h.rootHash === rootHash);
+      const versionNum = versionsOfThisEntry.length;
+      setCurrentVersion({ versionNum, rootHash });
     } catch (error) {
       console.error('Error loading history:', error);
     }
@@ -276,6 +304,9 @@ function App() {
     setHeartClicked({});
     setShowSearch(false);
     setViewingEntry(null);
+    setEditingEntryHash(null);
+    setCurrentVersion(null);
+    window.location.hash = '';
   };
 
   // View saved entries
@@ -343,11 +374,13 @@ function App() {
         {viewingEntry && (
           <div className="left-sidebar">
             <div className="sidebar-header">
+              <h2>{currentVersion ? `V${currentVersion.versionNum}` : 'Entry'}</h2>
               <button
                 className="close-sidebar-btn"
                 onClick={() => {
                   setViewingEntry(null);
                   setEditingEntryHash(null);
+                  setCurrentVersion(null);
                 }}
                 title="Close sidebar"
               >
