@@ -397,13 +397,15 @@ function App() {
                   />
                 </div>
               ))}
+              <div>
               <button
                 className="save-button"
                 onClick={autoSaveEntry}
                 disabled={Object.values(heartClicked).filter(Boolean).length === 0}
               >
-                💾 Save Entry
+                Save Entry
               </button>
+              </div>
             </div>
           )}
         </>
