@@ -97,7 +97,7 @@ function App() {
         console.log('Has entry hash:', hasEntryHash);
 
         if (hasEntryHash) {
-          // Load entry from URL
+          // Load entry from URL - but don't call viewEntryDetails to avoid hash loop
           const entryHash = hash.substring('#/entry/'.length);
           console.log('Attempting to load entry from URL with hash:', entryHash);
           try {
@@ -105,14 +105,34 @@ function App() {
             console.log('✓ Query result:', entry);
             if (entry) {
               console.log('✓ Entry found in database');
-              // Ensure rootHash is set
+              // Load entry data directly into form without calling viewEntryDetails
               const entryWithRoot = {
                 ...entry,
                 rootHash: entry.rootHash || entry.hash
               };
-              console.log('✓ Calling viewEntryDetails with entry');
-              await viewEntryDetails(entryWithRoot);
-              console.log('✓ viewEntryDetails completed');
+              console.log('✓ Loading entry data into form');
+              setViewingEntry(entryWithRoot);
+              setShowSearch(false);
+              setEditingEntryHash(entry.hash);
+
+              // Load entry data into form
+              setTitle(entry.content.title);
+              setDescription(entry.content.description);
+              setAffirmations(entry.content.affirmations);
+              setHeartClicked(entry.content.affirmations.reduce((acc, _, idx) => {
+                acc[idx] = true;
+                return acc;
+              }, {}));
+
+              // Load history
+              const history = await getMerkleTree();
+              setEntryHistory(history);
+              const rootHash = entry.rootHash || entry.hash;
+              const versionsOfThisEntry = history.filter(h => h.rootHash === rootHash);
+              const versionNum = versionsOfThisEntry.length;
+              console.log('✓ Setting current version:', { versionNum, rootHash });
+              setCurrentVersion({ versionNum, rootHash });
+              console.log('✓ Entry loaded successfully');
             } else {
               console.warn('✗ Entry not found for hash:', entryHash);
               console.log('Falling back to demo');
