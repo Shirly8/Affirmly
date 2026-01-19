@@ -46,6 +46,8 @@ function App() {
   useEffect(() => {
     const init = async () => {
       try {
+        console.log('=== INITIALIZATION STARTED ===');
+        console.log('Current URL hash:', window.location.hash);
         await initDB();
 
         const demoV1 = {
@@ -78,39 +80,50 @@ function App() {
         let v1Result;
         try {
           v1Result = await saveToStorage(demoV1);
-          console.log('V1 created with hash:', v1Result.hash);
+          console.log('✓ V1 created with hash:', v1Result.hash);
 
           await saveToStorage(demoV2, v1Result.hash);
-          console.log('V2 created with parent hash:', v1Result.hash);
-          console.log('Demo entries created with Merkle chain');
+          console.log('✓ V2 created with parent hash:', v1Result.hash);
+          console.log('✓ Demo entries created with Merkle chain');
         } catch (demoErr) {
-          console.error('Error creating demo entries:', demoErr);
+          console.error('✗ Error creating demo entries:', demoErr);
           return;
         }
 
         // Check if there's an entry hash in the URL
         const hash = window.location.hash;
+        console.log('Checking URL hash:', hash);
         const hasEntryHash = hash.startsWith('#/entry/');
+        console.log('Has entry hash:', hasEntryHash);
 
         if (hasEntryHash) {
           // Load entry from URL
           const entryHash = hash.substring('#/entry/'.length);
+          console.log('Attempting to load entry from URL with hash:', entryHash);
           try {
             const entry = await getEntryByHash(entryHash);
-            console.log('Loaded entry from URL:', entryHash, entry);
+            console.log('✓ Query result:', entry);
             if (entry) {
+              console.log('✓ Entry found in database');
               // Ensure rootHash is set
               const entryWithRoot = {
                 ...entry,
                 rootHash: entry.rootHash || entry.hash
               };
-              console.log('Entry with root:', entryWithRoot);
+              console.log('✓ Calling viewEntryDetails with entry');
               await viewEntryDetails(entryWithRoot);
+              console.log('✓ viewEntryDetails completed');
             } else {
-              console.warn('Entry not found for hash:', entryHash);
+              console.warn('✗ Entry not found for hash:', entryHash);
+              console.log('Falling back to demo');
               // Fallback to demo if entry not found
               setTitle(demoV1.title);
               setDescription(demoV1.description);
+              setAffirmations(demoV1.affirmations);
+              setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
+                acc[idx] = true;
+                return acc;
+              }, {}));
               setViewingEntry({
                 hash: v1Result.hash,
                 rootHash: v1Result.hash,
@@ -124,22 +137,33 @@ function App() {
               window.location.hash = `#/entry/${v1Result.hash}`;
             }
           } catch (err) {
-            console.error('Error loading entry from URL:', err);
+            console.error('✗ Error loading entry from URL:', err);
           }
         } else {
           // No URL hash - display demo
+          console.log('No URL hash detected, showing demo');
           setTitle(demoV1.title);
           setDescription(demoV1.description);
+          setAffirmations(demoV1.affirmations);
+          setHeartClicked(demoV1.affirmations.reduce((acc, _, idx) => {
+            acc[idx] = true;
+            return acc;
+          }, {}));
           setViewingEntry({
             hash: v1Result.hash,
             rootHash: v1Result.hash,
             content: demoV1,
             timestamp: demoV1.timestamp
           });
+          const history = await getMerkleTree();
+          setEntryHistory(history);
+          const versionsOfThisEntry = history.filter(h => h.rootHash === v1Result.hash);
+          setCurrentVersion({ versionNum: versionsOfThisEntry.length, rootHash: v1Result.hash });
           window.location.hash = `#/entry/${v1Result.hash}`;
         }
+        console.log('=== INITIALIZATION COMPLETED ===');
       } catch (err) {
-        console.error('Failed to initialize DB:', err);
+        console.error('✗ Failed to initialize DB:', err);
       }
     };
     init();
@@ -280,13 +304,19 @@ function App() {
 
   // View entry details
   const viewEntryDetails = async (entry) => {
+    console.log('=== viewEntryDetails called ===');
+    console.log('Entry:', entry);
+
     setViewingEntry(entry);
     setShowSearch(false);  // Auto-close search when viewing entry
     setEditingEntryHash(entry.hash);  // Mark that we're working with this entry
 
     // Load entry data into form
+    console.log('Setting title:', entry.content.title);
     setTitle(entry.content.title);
+    console.log('Setting description:', entry.content.description);
     setDescription(entry.content.description);
+    console.log('Setting affirmations:', entry.content.affirmations);
     setAffirmations(entry.content.affirmations);
     setHeartClicked(entry.content.affirmations.reduce((acc, _, idx) => {
       acc[idx] = true;
@@ -301,10 +331,13 @@ function App() {
       const rootHash = entry.rootHash || entry.hash;
       const versionsOfThisEntry = history.filter(h => h.rootHash === rootHash);
       const versionNum = versionsOfThisEntry.length;
+      console.log('Setting current version:', { versionNum, rootHash });
       setCurrentVersion({ versionNum, rootHash });
 
       // Update URL to point to root entry (original/created version)
+      console.log('Updating URL hash to:', `#/entry/${rootHash}`);
       window.location.hash = `#/entry/${rootHash}`;
+      console.log('=== viewEntryDetails completed ===');
     } catch (error) {
       console.error('Error loading history:', error);
     }
