@@ -30,25 +30,30 @@ function App() {
         const entries = await getAllEntries();
         if (entries.length === 0) {
           const demoV1 = {
-            title: "Morning Anxiety",
-            description: "Feeling overwhelmed about the day ahead",
+            title: "I'm 24 and I constantly feel like I'm a failure",
+            description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
             affirmations: [
-              "I am capable of handling today's challenges",
-              "My worries are temporary, not permanent",
-              "I choose to focus on what I can control",
+              "Comparison is the thief of joy. I embrace my journey and celebrate the successes of others without diminishing my own.",
+              "Remember, life is not a race, and success is not a linear path. Your worth and value are inherent, regardless of external achievements.",
+              "I am exactly where I need to be at this moment, and I trust the timing of my life.",
+              "My journey is unique and valuable, unfolding at its own perfect pace.",
+              "I choose progress over perfection, and I celebrate every step forward.",
+              "My worth is not determined by my age or achievements.",
             ],
             mood: "neutral",
             timestamp: new Date(Date.now() - 3600000).toISOString()
           };
 
           const demoV2 = {
-            title: "Morning Anxiety",
-            description: "Feeling overwhelmed about the day ahead",
+            title: "I'm 24 and I constantly feel like I'm a failure",
+            description: "I see all my friends getting married, having kids, getting senior roles, advancing in life and I just seem to not be getting anywhere in life. I can't help compare to them because I feel like I'm nowhere near where i want to be in life and I feel that time is running",
             affirmations: [
-              "I am strong and resilient",
-              "Today is full of new opportunities",
-              "I deserve peace and calm",
-              "Every challenge makes me stronger",
+              "I am building a life that is authentically mine, not a copy of someone else's.",
+              "My past does not define my future. Today is a new opportunity to grow.",
+              "I trust in my resilience and my ability to create the life I desire.",
+              "Success comes in many forms, and I am already experiencing it in ways I haven't noticed.",
+              "I release the need to compare and embrace gratitude for my unique path.",
+              "Every setback is setting me up for a comeback that is uniquely mine.",
             ],
             mood: "neutral",
             timestamp: new Date(Date.now() - 1800000).toISOString()
