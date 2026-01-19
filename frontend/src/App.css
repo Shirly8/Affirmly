@@ -871,58 +871,83 @@ h2 {
 }
 
 .sidebar-merkle-node {
-  background: linear-gradient(135deg, #e8f4f8 0%, #f0f9fc 100%);
-  padding: 12px;
-  border-radius: 6px;
-  border-left: 4px solid #61dafbaa;
-  border-right: 1px solid rgba(97, 218, 251, 0.2);
-  box-shadow: 0 2px 6px rgba(97, 218, 251, 0.15);
-  transition: all 0.2s;
+  background: linear-gradient(135deg, #c8e6f5 0%, #ddf4fb 100%);
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 6px solid #61dafbaa;
+  border-right: 2px solid #61dafbaa;
+  border-top: 2px solid #61dafbaa;
+  border-bottom: 2px solid #61dafbaa;
+  box-shadow: 0 6px 16px rgba(97, 218, 251, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
+  overflow: hidden;
 }
 
 .sidebar-merkle-node::before {
   content: '';
   position: absolute;
-  top: -2px;
+  top: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #61dafbaa, transparent);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #61dafbaa, #4db8d6, #61dafbaa, transparent);
   border-radius: 1px;
 }
 
+.sidebar-merkle-node::after {
+  content: '🔗';
+  position: absolute;
+  bottom: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  opacity: 0.3;
+  z-index: 0;
+}
+
 .sidebar-merkle-node:hover {
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px rgba(97, 218, 251, 0.25);
-  background: linear-gradient(135deg, #daeef5 0%, #e8f5fc 100%);
+  transform: translateX(8px) scale(1.02);
+  box-shadow: 0 10px 24px rgba(97, 218, 251, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  background: linear-gradient(135deg, #aedcf0 0%, #c8f0fc 100%);
+  border-left-width: 8px;
 }
 
 .sidebar-merkle-node small {
   display: block;
   font-size: 12px;
-  line-height: 1.5;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
 }
 
 .node-version {
-  font-weight: 700;
-  color: #61dafbaa;
-  font-size: 13px;
-  margin-bottom: 4px;
+  font-weight: 800;
+  color: #0d7cb5;
+  font-size: 16px;
+  margin-bottom: 6px;
+  text-shadow: 0 1px 2px rgba(97, 218, 251, 0.2);
+  letter-spacing: 1px;
 }
 
 .node-action {
-  color: #4a90a4;
-  font-size: 11px;
-  font-weight: 500;
+  color: #0d5c87;
+  font-size: 12px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
+  background: rgba(97, 218, 251, 0.15);
+  padding: 4px 8px;
+  border-radius: 3px;
+  display: inline-block;
+  margin-top: 4px;
 }
 
 .node-date {
-  color: #7aa3b5;
-  font-size: 10px;
-  margin-top: 4px;
+  color: #0d7cb5;
+  font-size: 11px;
+  margin-top: 6px;
+  font-weight: 500;
 }
 
 .left-sidebar .edit-button {
