@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import affirmlyLogo from '../../Affirmly.png'
+import affirmlyLogo from './assets/images/Affirmly.gif'
 import affirmlyIcon from './assets/icon/2.svg'
 
 import './App.css'
